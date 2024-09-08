@@ -149,7 +149,10 @@
         <artifactId>protobuf-maven-plugin</artifactId>
         <version>${maven_protobuf_plugin_version}</version>
         <configuration>
-          <protocArtifact>com.google.protobuf:protoc:${protobuf-java_version}:exe:${os.detected.classifier}</protocArtifact>
+          <!-- 手动指定 classifier -->
+          <protocArtifact>com.google.protobuf:protoc:${protobuf-java_version}:exe:windows-x86_64</protocArtifact> <!-- For Windows -->
+          <!-- MacOS 你可以用: osx-x86_64 -->
+          <!-- Linux 你可以用: linux-x86_64 -->
           <pluginId>triple-java</pluginId>
           <outputDirectory>build/generated/source/proto/main/java</outputDirectory>
         </configuration>

@@ -106,7 +106,7 @@
         <artifactId>protobuf-maven-plugin</artifactId>
         <version>${maven_protobuf_plugin_version}</version>
         <configuration>
-          <protocArtifact>com.google.protobuf:protoc:${protobuf-java_version}:exe:${os.detected.classifier}</protocArtifact>
+          <protocArtifact>com.google.protobuf:protoc:${protobuf-java_version}:exe:windows-x86_64</protocArtifact>
           <protocPlugins>
             <protocPlugin>
               <id>dubbo</id>

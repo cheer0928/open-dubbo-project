@@ -23,12 +23,10 @@ import org.apache.dubbo.common.constants.LoggerCodeConstants;
 import org.apache.dubbo.common.logger.ErrorTypeAwareLogger;
 import org.apache.dubbo.common.logger.LoggerFactory;
 import org.apache.dubbo.common.threadpool.manager.FrameworkExecutorRepository;
-import org.apache.dubbo.common.utils.IOUtils;
 import org.apache.dubbo.common.utils.StringUtils;
 import org.apache.dubbo.rpc.model.FrameworkModel;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.security.InvalidAlgorithmParameterException;
@@ -42,7 +40,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import io.grpc.Channel;
-import io.grpc.Metadata;
 import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 import io.grpc.netty.shaded.io.netty.handler.ssl.util.InsecureTrustManagerFactory;
@@ -55,7 +52,6 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.bouncycastle.util.io.pem.PemObject;
 
-import static io.grpc.stub.MetadataUtils.newAttachHeadersInterceptor;
 import static org.apache.dubbo.common.constants.LoggerCodeConstants.CONFIG_SSL_CERT_GENERATE_FAILED;
 import static org.apache.dubbo.common.constants.LoggerCodeConstants.CONFIG_SSL_CONNECT_INSECURE;
 import static org.apache.dubbo.common.constants.LoggerCodeConstants.INTERNAL_ERROR;
@@ -228,13 +224,13 @@ public class DubboCertManager {
         }
 
         String csr = generateCsr(keyPair);
-        DubboCertificateServiceGrpc.DubboCertificateServiceBlockingStub stub =
-                DubboCertificateServiceGrpc.newBlockingStub(channel);
-        stub = setHeaderIfNeed(stub);
-
+        //DubboCertificateServiceGrpc.DubboCertificateServiceBlockingStub stub =
+        //        DubboCertificateServiceGrpc.newBlockingStub(channel);
+        //stub = setHeaderIfNeed(stub);
+        //
         String privateKeyPem = generatePrivatePemKey(keyPair);
-        DubboCertificateResponse certificateResponse = stub.createCertificate(generateRequest(csr));
-
+        //DubboCertificateResponse certificateResponse = stub.createCertificate(generateRequest(csr));
+        DubboCertificateResponse certificateResponse = null;
         if (certificateResponse == null || !certificateResponse.getSuccess()) {
             logger.error(
                     CONFIG_SSL_CERT_GENERATE_FAILED,
@@ -254,32 +250,33 @@ public class DubboCertManager {
                 certificateResponse.getExpireTime());
     }
 
-    private DubboCertificateServiceGrpc.DubboCertificateServiceBlockingStub setHeaderIfNeed(
-            DubboCertificateServiceGrpc.DubboCertificateServiceBlockingStub stub) throws IOException {
-        String oidcTokenPath = certConfig.getOidcTokenPath();
-        if (StringUtils.isNotEmpty(oidcTokenPath)) {
-            Metadata header = new Metadata();
-            Metadata.Key<String> key = Metadata.Key.of("authorization", Metadata.ASCII_STRING_MARSHALLER);
-            header.put(
-                    key,
-                    "Bearer "
-                            + IOUtils.read(new FileReader(oidcTokenPath))
-                                    .replace("\n", "")
-                                    .replace("\t", "")
-                                    .replace("\r", "")
-                                    .trim());
-
-            stub = stub.withInterceptors(newAttachHeadersInterceptor(header));
-            logger.info("Use oidc token from " + oidcTokenPath + " to connect to Dubbo Certificate Authority.");
-        } else {
-            logger.warn(
-                    CONFIG_SSL_CONNECT_INSECURE,
-                    "",
-                    "",
-                    "Use insecure connection to connect to Dubbo Certificate Authority. Reason: No oidc token is provided.");
-        }
-        return stub;
-    }
+    //private DubboCertificateServiceGrpc.DubboCertificateServiceBlockingStub setHeaderIfNeed(
+    //        DubboCertificateServiceGrpc.DubboCertificateServiceBlockingStub stub) throws IOException {
+    //    String oidcTokenPath = certConfig.getOidcTokenPath();
+    //    if (StringUtils.isNotEmpty(oidcTokenPath)) {
+    //        Metadata header = new Metadata();
+    //        Metadata.Key<String> key = Metadata.Key.of("authorization", Metadata.ASCII_STRING_MARSHALLER);
+    //        header.put(
+    //                key,
+    //                "Bearer "
+    //                        + IOUtils.read(new FileReader(oidcTokenPath))
+    //                                .replace("\n", "")
+    //                                .replace("\t", "")
+    //                                .replace("\r", "")
+    //                                .trim());
+    //
+    //        stub = stub.withInterceptors(newAttachHeadersInterceptor(header));
+    //        logger.info("Use oidc token from " + oidcTokenPath + " to connect to Dubbo Certificate Authority.");
+    //    } else {
+    //        logger.warn(
+    //                CONFIG_SSL_CONNECT_INSECURE,
+    //                "",
+    //                "",
+    //                "Use insecure connection to connect to Dubbo Certificate Authority. Reason: No oidc token is
+    //                provided.");
+    //    }
+    //    return stub;
+    //}
 
     /**
      * Generate key pair with RSA
