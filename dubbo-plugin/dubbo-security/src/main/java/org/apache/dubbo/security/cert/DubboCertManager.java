@@ -18,7 +18,6 @@ package org.apache.dubbo.security.cert;
 
 import org.apache.dubbo.auth.v1alpha1.DubboCertificateRequest;
 import org.apache.dubbo.auth.v1alpha1.DubboCertificateResponse;
-import org.apache.dubbo.auth.v1alpha1.DubboCertificateServiceGrpc;
 import org.apache.dubbo.common.constants.LoggerCodeConstants;
 import org.apache.dubbo.common.logger.ErrorTypeAwareLogger;
 import org.apache.dubbo.common.logger.LoggerFactory;
